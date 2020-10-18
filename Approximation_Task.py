@@ -1,7 +1,7 @@
-import cmath as cm # Математическая библеотека
-import numpy as np # Вспомогательная мат. библеотека
-from scipy import interpolate
-import matplotlib.pyplot as mp # Библеотека для отрисовки графиков
+import cmath as cm                  # Математическая библеотека
+import numpy as np                  # Вспомогательная мат. библеотека
+from scipy import interpolate       # Интерполяция сплайнами
+import matplotlib.pyplot as mp      # Библеотека для отрисовки графиков
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -155,10 +155,6 @@ def Start():
     # Отрисовка
     mp.show()
 
-
-
 # Главный метод
 if __name__ == "__main__": Start()
-
-    
-    
+  
