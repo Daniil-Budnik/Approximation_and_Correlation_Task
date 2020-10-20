@@ -53,7 +53,7 @@ def Interpolation_Lagrange_Lolynomial(F, A = 0, B = 1, Num = 1,TITLE=""):
     _Y = [Lagranz(_X, [F(xi) for xi in _X] ,x ) for x in _X]
 
     # Строим приближение
-    mp.plot(_X, _Y, Color='Red',alpha=0.4, label="Приближение") 
+    mp.plot(_X, _Y, Color='Red',alpha=0.8, label="Приближение") 
 
     # Легенда
     mp.legend()
