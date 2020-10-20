@@ -1,6 +1,6 @@
 import cmath as cm                  # Математическая библеотека
 import numpy as np                  # Вспомогательная мат. библеотека
-from scipy import interpolate       # Интерполяция сплайнами
+import scipy.interpolate as it      # Интерполяция сплайнами
 import matplotlib.pyplot as mp      # Библеотека для отрисовки графиков
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------
@@ -19,53 +19,44 @@ def F2(X , B1 = 1, B2 = 1, B3 = 1, B4 = 1):
 
 # Получение массива координат из функции
 # Принимает: функцию, интервал от A до B, шаг
-# Возвращает: cловарь из двух массивов X и Y
-def Func_oXY(F, A = 0, B = 1, T = 100):
-    X, Y, C, K = np.linspace(A,B,T), [], (B - A) / T, A
-    while(K < B):
-        Y.append(F(K))
-        K += C
-    return {"X" : X, "Y" : Y}
+def Func_oXY(F, A = 0, B = 1, STEP = 0.01): X = np.arange(A,B,STEP); return {"X" : X, "Y" : [ F(x) for x in X] }
 
 # Интерполяционный многочлен Лагранжа
-# Принимает: функцию, интервал от A до B, 
-# точка или набор точек для приближения, шаг
+# Принимает: функцию, интервал от A до B
 # Метод строит график функции и отображает точк(у,и) приближения
-def Interpolation_Lagrange_Lolynomial(F, A = 0, B = 1, T = 100, Num = 1,TITLE=""):
+def Interpolation_Lagrange_Lolynomial(F, A = 0, B = 1, Num = 1,TITLE=""):
+
+    # Функция Лагранжа
+    # X и Y это мноество точек, Xn точка для приближения
+    def Lagranz(X, Y, Xn):
+        Z = 0
+        for J in range(len(Y)):
+            P1, P2 = 1, 1
+            for I in range(len(X)):
+                if (I != J):
+                    P1 = P1 * (Xn - X[I])
+                    P2 = P2 * (X[J] - X[I])
+            Z += Y[J] * (P1 / P2)
+        return Z
 
     # Позиция на графике
     mp.subplot(3,2,Num); mp.title(TITLE,fontsize=10)
 
     # Получаем все возможные точки функции с шагом
-    _F = Func_oXY(F,A,B,T) 
+    _F = Func_oXY(F,A,B) 
 
     # Строим саму функцию
     mp.plot(_F["X"], _F["Y"], 'Green', label="Функция" ) 
 
     # Строим набор точек приближения
-    _Y = [Lagranz(_F["X"], _F["Y"] ,_F["X"][i]) for i in range(len(_F["X"]))]
+    _X = np.linspace(0,1,50)  
+    _Y = [Lagranz(_X, [F(xi) for xi in _X] ,x ) for x in _X]
 
     # Строим приближение
-    mp.plot(_F["X"], _Y, '--o', Color='Red',alpha=0.4, label="Приближение") 
+    mp.plot(_X, _Y, Color='Red',alpha=0.4, label="Приближение") 
 
     # Легенда
     mp.legend()
-
-# Функция Лагранжа
-# X и Y это мноество точек, Xn точка для приближения
-def Lagranz(X, Y, Xn):
-    Z = 0
-    for J in range(len(Y)):
-        P1, P2 = 1, 1
-        for I in range(len(X)):
-            if I == J:
-                P1 = P1 * 1
-                P2 = P2 * 1
-            else:
-                P1 = P1 * (Xn - X[I])
-                P2 = P2 * (X[J] - X[I])
-        Z = Z + Y[J] * P1 /P2
-    return Z
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -73,10 +64,7 @@ def Lagranz(X, Y, Xn):
 def Sink_Approximation(F, A = 0, B = 1, Num = 1,TITLE=""):
 
     # Синк апроксимация
-    def Sink(x,n = 100):
-        _S = 0
-        for k in range(0, 100): _S += ( ( np.sin(  np.pi * (n*x - k)  )) / (  np.pi * (n * x - k)  )) * F(_F["X"][k])
-        return _S
+    def Sink(x, n = 100): return sum([((np.sin(np.pi*(n*x-k))) / (np.pi*(n*x-k)))*F(k/n) for k in range(0, n)])
 
     # Позиция на графике
     mp.subplot(3,2,Num); mp.title(TITLE,fontsize=10)
@@ -88,10 +76,11 @@ def Sink_Approximation(F, A = 0, B = 1, Num = 1,TITLE=""):
     mp.plot(_F["X"], _F["Y"], 'Green', label="Функция")
     
     # Строим набор точек приближения
-    _Y = [Sink(_F["X"][i]) for i in range(len(_F["X"]))]
+    _X = np.linspace(0,1,50)
+    _Y = [Sink(x) for x in _X]
 
     # Строим приближение
-    mp.plot(_F["X"], _Y, '--o', Color='Red',alpha=0.4, label="Приближение") 
+    mp.plot(_X , _Y, Color='Red',alpha=0.8, label="Приближение") 
     
     # Легенда
     mp.legend()
@@ -100,12 +89,6 @@ def Sink_Approximation(F, A = 0, B = 1, Num = 1,TITLE=""):
 
 # Интерполяция сплайнами
 def Spline_Interpolation(F, A = 0, B = 1, Num = 1,TITLE=""):
-
-     # Синк апроксимация
-    def Sink(x,n = 100):
-        _S = 0
-        for k in range(0, 100): _S += ( ( np.sin(  np.pi * (n*x - k)  )) / (  np.pi * (n * x - k)  )) * F(_F["X"][k])
-        return _S
 
     # Позиция на графике
     mp.subplot(3,2,Num); mp.title(TITLE,fontsize=10)
@@ -116,13 +99,12 @@ def Spline_Interpolation(F, A = 0, B = 1, Num = 1,TITLE=""):
     # Строим саму функцию
     mp.plot(_F["X"], _F["Y"], 'Green', label="Функция") 
 
-    INTERPOLATE = interpolate.splrep(_F["X"], _F["Y"])
-
     # Строим набор точек приближения
-    _Y = [interpolate.splev(_F["X"][i], INTERPOLATE) for i in range(len(_F["X"]))]
+    _X = np.linspace(0,1,50)
+    _Y = [it.splev(x, it.splrep(_F["X"], _F["Y"])) for x in _X]
 
     # Строим приближение
-    mp.plot(_F["X"], _Y, '--o', Color='Red',alpha=0.4, label="Приближение") 
+    mp.plot(_X, _Y, Color='Red',alpha=0.8, label="Приближение") 
 
     # Легенда
     mp.legend()
@@ -157,4 +139,3 @@ def Start():
 
 # Главный метод
 if __name__ == "__main__": Start()
-  
