@@ -24,7 +24,7 @@ def Func_oXY(F, A = 0, B = 1, STEP = 0.01): X = np.arange(A,B,STEP); return {"X"
 # Интерполяционный многочлен Лагранжа
 # Принимает: функцию, интервал от A до B
 # Метод строит график функции и отображает точк(у,и) приближения
-def Interpolation_Lagrange_Lolynomial(F, A = 0, B = 1, Num = 1,TITLE=""):
+def Interpolation_Lagrange_Lolynomial(F, A = 0, B = 1, STEP=0.01, Num = 1,TITLE=""):
 
     # Функция Лагранжа
     # X и Y это мноество точек, Xn точка для приближения
@@ -43,13 +43,13 @@ def Interpolation_Lagrange_Lolynomial(F, A = 0, B = 1, Num = 1,TITLE=""):
     mp.subplot(3,2,Num); mp.title(TITLE,fontsize=10)
 
     # Получаем все возможные точки функции с шагом
-    _F = Func_oXY(F,A,B) 
+    _F = Func_oXY(F,A,B,STEP) 
 
     # Строим саму функцию
     mp.plot(_F["X"], _F["Y"], 'Green', label="Функция" ) 
 
     # Строим набор точек приближения
-    _X = np.linspace(0,1,50)  
+    _X = np.linspace(A,B,int(1/STEP/2))  
     _Y = [Lagranz(_X, [F(xi) for xi in _X] ,x ) for x in _X]
 
     # Строим приближение
@@ -61,22 +61,22 @@ def Interpolation_Lagrange_Lolynomial(F, A = 0, B = 1, Num = 1,TITLE=""):
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Интерполяция с помощью синк-аппроксимации
-def Sink_Approximation(F, A = 0, B = 1, Num = 1,TITLE=""):
+def Sink_Approximation(F, A = 0, B = 1, STEP=0.01, Num = 1,TITLE=""):
 
     # Синк апроксимация
-    def Sink(x, n = 100): return sum([((np.sin(np.pi*(n*x-k))) / (np.pi*(n*x-k)))*F(k/n) for k in range(0, n)])
+    def Sink(x, n = 100): return sum([((np.sin(np.pi*(n*x-k))) / (np.pi*(n*x-k)))*F(k/n) for k in range(1, n)])
 
     # Позиция на графике
     mp.subplot(3,2,Num); mp.title(TITLE,fontsize=10)
 
     # Получаем все возможные точки функции с шагом
-    _F = Func_oXY(F,A,B)
+    _F = Func_oXY(F,A,B) 
 
     # Строим саму функцию
-    mp.plot(_F["X"], _F["Y"], 'Green', label="Функция")
+    mp.plot(_F["X"], _F["Y"], 'Green', label="Функция" ) 
     
     # Строим набор точек приближения
-    _X = np.linspace(0,1,50)
+    _X = np.linspace(A,B,int(1/STEP/2))
     _Y = [Sink(x) for x in _X]
 
     # Строим приближение
@@ -88,7 +88,7 @@ def Sink_Approximation(F, A = 0, B = 1, Num = 1,TITLE=""):
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Интерполяция сплайнами
-def Spline_Interpolation(F, A = 0, B = 1, Num = 1,TITLE=""):
+def Spline_Interpolation(F, A = 0, B = 1, STEP=0.01, Num = 1,TITLE=""):
 
     # Позиция на графике
     mp.subplot(3,2,Num); mp.title(TITLE,fontsize=10)
@@ -100,7 +100,7 @@ def Spline_Interpolation(F, A = 0, B = 1, Num = 1,TITLE=""):
     mp.plot(_F["X"], _F["Y"], 'Green', label="Функция") 
 
     # Строим набор точек приближения
-    _X = np.linspace(0,1,50)
+    _X = np.linspace(A,B,int(1/STEP/2))
     _Y = [it.splev(x, it.splrep(_F["X"], _F["Y"])) for x in _X]
 
     # Строим приближение
@@ -119,7 +119,7 @@ def Start():
     # Интерполяционный многочлен Лагранжа
     Interpolation_Lagrange_Lolynomial(F1,0,1,Num=1, TITLE="Приближение функции: $f(x) = (c1 + c2 + m1 + m2) ln (Pi - x + 1) ^ ( ln(x + 1) )$")
     Interpolation_Lagrange_Lolynomial(F2,0,1,Num=2, TITLE="Приближение функции: $f(x) = (b1 + b2 + b3 + b4) |x - 0.5|$")
- 
+
     # ------------------------------------------------------------------------------------------------------------------------------------------------
 
     # Приближение методом синк-апроксимации
