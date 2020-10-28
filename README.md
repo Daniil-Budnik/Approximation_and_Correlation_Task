@@ -6,7 +6,7 @@
 
     Решение задачи №1
 
-![alt tag](https://github.com/PC-SET/Approximation_and_Correlation_Task/blob/main/Image/0.jpg?raw=true "Решение 1")​
+![alt tag](https://github.com/PC-SET/Approximation_and_Correlation_Task/blob/main/Image/01.jpg?raw=true "Решение 1")​
 
     Задача №2 - корреляция сигнала со сдвигом по фазе
 
