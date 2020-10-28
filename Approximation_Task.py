@@ -8,7 +8,7 @@ import matplotlib.pyplot as mp      # Библеотека для отрисов
 #                               В ДВУХ ЭТИХ ФУНКЦИЯХ НУЖНО ПОМЕНЯТЬ КОЭФИЦЕНТЫ !!!
 
 # Первая функция
-def F1(X , C1 = 1, C2 = 2, M1 = 3, M2 = 4):
+def F1(X , C1 = 5, C2 = 6, M1 = 7, M2 = 8):
     return (C1 + C2 + M1 + M2) * (cm.log(cm.pi - X + 1) ** (cm.log(X + 1)))
 
 # Вторая функция
@@ -19,12 +19,12 @@ def F2(X , B1 = 1, B2 = 1, B3 = 1, B4 = 1):
 
 # Получение массива координат из функции
 # Принимает: функцию, интервал от A до B, шаг
-def Func_oXY(F, A = 0, B = 1, STEP = 0.01): X = np.arange(A,B,STEP); return {"X" : X, "Y" : [ F(x) for x in X] }
+def Func_oXY(F, A = 0, B = 1, STEP = 0.001): X = np.arange(A,B,STEP); return {"X" : X, "Y" : [ F(x) for x in X] }
 
 # Интерполяционный многочлен Лагранжа
 # Принимает: функцию, интервал от A до B
 # Метод строит график функции и отображает точк(у,и) приближения
-def Interpolation_Lagrange_Lolynomial(F, A = 0, B = 1, STEP=0.01, Num = 1,TITLE=""):
+def Interpolation_Lagrange_Lolynomial(F, A = 0, B = 1, NODES = 10 , STEP=0.01, Num = 1,TITLE=""):
 
     # Функция Лагранжа
     # X и Y это мноество точек, Xn точка для приближения
@@ -34,8 +34,8 @@ def Interpolation_Lagrange_Lolynomial(F, A = 0, B = 1, STEP=0.01, Num = 1,TITLE=
             P1, P2 = 1, 1
             for I in range(len(X)):
                 if (I != J):
-                    P1 = P1 * (Xn - X[I])
-                    P2 = P2 * (X[J] - X[I])
+                    P1 *= (Xn - X[I])
+                    P2 *= (X[J] - X[I])
             Z += Y[J] * (P1 / P2)
         return Z
 
@@ -49,11 +49,11 @@ def Interpolation_Lagrange_Lolynomial(F, A = 0, B = 1, STEP=0.01, Num = 1,TITLE=
     mp.plot(_F["X"], _F["Y"], 'Green', label="Функция" ) 
 
     # Строим набор точек приближения
-    _X = np.linspace(A,B,int(1/STEP/2))  
-    _Y = [Lagranz(_X, [F(xi) for xi in _X] ,x ) for x in _X]
+    _X = np.linspace(A,B,NODES)
+    _Y = [Lagranz(_X, [F(x) for x in _X] , x) for x in _F["X"]]
 
     # Строим приближение
-    mp.plot(_X, _Y, Color='Red',alpha=0.8, label="Приближение") 
+    mp.plot(_F["X"], _Y, Color='Red',alpha=0.8, label="Приближение") 
 
     # Легенда
     mp.legend()
@@ -61,10 +61,10 @@ def Interpolation_Lagrange_Lolynomial(F, A = 0, B = 1, STEP=0.01, Num = 1,TITLE=
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Интерполяция с помощью синк-аппроксимации
-def Sink_Approximation(F, A = 0, B = 1, STEP=0.01, Num = 1,TITLE=""):
+def Sink_Approximation(F, A = 0, B = 1, NODES = 50, STEP=0.01, Num = 1,TITLE=""):
 
     # Синк апроксимация
-    def Sink(x, n = 100): return sum([((np.sin(np.pi*(n*x-k))) / (np.pi*(n*x-k)))*F(k/n) for k in range(1, n)])
+    def Sink(x, n = NODES): return sum([((np.sin(np.pi*(n*x-k))) / (np.pi*(n*x-k)))*F(k/n) for k in range(1, n)])
 
     # Позиция на графике
     mp.subplot(3,2,Num); mp.title(TITLE,fontsize=10)
@@ -74,13 +74,9 @@ def Sink_Approximation(F, A = 0, B = 1, STEP=0.01, Num = 1,TITLE=""):
 
     # Строим саму функцию
     mp.plot(_F["X"], _F["Y"], 'Green', label="Функция" ) 
-    
-    # Строим набор точек приближения
-    _X = np.linspace(A,B,int(1/STEP/2))
-    _Y = [Sink(x) for x in _X]
-
+   
     # Строим приближение
-    mp.plot(_X , _Y, Color='Red',alpha=0.8, label="Приближение") 
+    mp.plot(_F["X"] , [Sink(x) for x in np.linspace(A,B,len(_F["X"]))], Color='Red',alpha=0.8, label="Приближение") 
     
     # Легенда
     mp.legend()
@@ -88,7 +84,7 @@ def Sink_Approximation(F, A = 0, B = 1, STEP=0.01, Num = 1,TITLE=""):
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Интерполяция сплайнами
-def Spline_Interpolation(F, A = 0, B = 1, STEP=0.01, Num = 1,TITLE=""):
+def Spline_Interpolation(F, A = 0, B = 1, NODES = 10, STEP=0.01, Num = 1,TITLE=""):
 
     # Позиция на графике
     mp.subplot(3,2,Num); mp.title(TITLE,fontsize=10)
@@ -100,11 +96,13 @@ def Spline_Interpolation(F, A = 0, B = 1, STEP=0.01, Num = 1,TITLE=""):
     mp.plot(_F["X"], _F["Y"], 'Green', label="Функция") 
 
     # Строим набор точек приближения
-    _X = np.linspace(A,B,int(1/STEP/2))
-    _Y = [it.splev(x, it.splrep(_F["X"], _F["Y"])) for x in _X]
+    
+    _X = np.linspace(A,B,NODES)
+    _Y = [it.splev(x, it.splrep(_X, [F(x) for x in _X])) for x in _F["X"]]
+    #_Y = [Spline(x, _X, [ F(x) for x in _X]) for x in _F["X"]]                # Самописную функцию выпилил, работает не оч...
 
     # Строим приближение
-    mp.plot(_X, _Y, Color='Red',alpha=0.8, label="Приближение") 
+    mp.plot(_F["X"], _Y, Color='Red',alpha=0.8, label="Приближение") 
 
     # Легенда
     mp.legend()
