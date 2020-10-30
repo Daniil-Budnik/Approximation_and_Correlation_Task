@@ -24,19 +24,18 @@ def Func_oXY(F, A = 0, B = 1, STEP = 0.001): X = np.arange(A,B,STEP); return {"X
 # Интерполяционный многочлен Лагранжа
 # Принимает: функцию, интервал от A до B
 # Метод строит график функции и отображает точк(у,и) приближения
-def Interpolation_Lagrange_Lolynomial(F, A = 0, B = 1, NODES = 10 , STEP=0.01, Num = 1,TITLE=""):
+def Interpolation_Lagrange_Lolynomial(F, A = 0, B = 1, N = 7, STEP=0.01, Num = 1, TITLE=""):
 
     # Функция Лагранжа
-    # X и Y это мноество точек, Xn точка для приближения
-    def Lagranz(X, Y, Xn):
+    # X это мноество точек, Xn точка для приближения
+    def Lagranz(X, F, n):
         Z = 0
-        for J in range(len(Y)):
-            P1, P2 = 1, 1
-            for I in range(len(X)):
+        for J in range(0,n+1):
+            P = 1
+            for I in range(0,n+1):
                 if (I != J):
-                    P1 *= (Xn - X[I])
-                    P2 *= (X[J] - X[I])
-            Z += Y[J] * (P1 / P2)
+                    P *= (X - I/n)/(J/n - I/n)
+            Z += F(J/n) * P
         return Z
 
     # Позиция на графике
@@ -48,12 +47,8 @@ def Interpolation_Lagrange_Lolynomial(F, A = 0, B = 1, NODES = 10 , STEP=0.01, N
     # Строим саму функцию
     mp.plot(_F["X"], _F["Y"], 'Green', label="Функция" ) 
 
-    # Строим набор точек приближения
-    _X = np.linspace(A,B,NODES)
-    _Y = [Lagranz(_X, [F(x) for x in _X] , x) for x in _F["X"]]
-
     # Строим приближение
-    mp.plot(_F["X"], _Y, Color='Red',alpha=0.8, label="Приближение") 
+    mp.plot(_F["X"], Lagranz(_F["X"], F, N), Color='Red',alpha=0.8, label="Приближение") 
 
     # Легенда
     mp.legend()
@@ -137,3 +132,16 @@ def Start():
 
 # Главный метод
 if __name__ == "__main__": Start()
+    
+    
+
+# ЭТИ ОПЕРАЦИИ РАВНОСИЛЬНЫ !!!
+
+
+# M = [i for i in range(10)]
+
+
+# M = []
+# for i in range(10):
+#   M.append(i)
+
